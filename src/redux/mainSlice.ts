@@ -1,36 +1,41 @@
-import { createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Api } from "../api/api";
 
 interface IMainState {
-    isLoading: boolean
-    error: string | null
-    searchValue: string
-    users: IUser[]
+    isLoading: boolean;
+    error: string | null;
+    totalCount: number;
+    searchValue: string;
+    users: IUser[];
 }
 
-interface IUser {
-    id: number | null
-    avatar_url: string
-    followers: number
-    following: number
-    location: string | null
-    name: string | null
-    login: string | null
-    public_repos: number | null
-    email: string | null
-    created_at: Date | null
-    bio: string | null
+export interface IUser {
+    id: number | null;
+    avatar_url: string;
+    followers: number;
+    following: number;
+    location: string | null;
+    name: string | null;
+    login: string | null;
+    public_repos: number | null;
+    email: string | null;
+    created_at: Date | null;
+    bio: string | null;
 }
 
+interface IGetUsers {
+    users: IUser[];
+    totalCount: number;
+}
 
-export const getUsers = createAsyncThunk<IUser[], string, {rejectValue: string}>(
+export const getUsers = createAsyncThunk<IGetUsers, string, { rejectValue: string }>(
     'main/getUsers',
-    async (searchValue, {rejectWithValue}) => {
+    async (searchValue, { rejectWithValue }) => {
         try {
-            const response = await Api.searchUsers(searchValue)
-            return (response) as IUser[]
+            const response = await Api.searchUsers(searchValue);
+            return response as IGetUsers;
         } catch (error: any) {
-            return rejectWithValue(error.message)
+            return rejectWithValue(error.message);
         }
     }
 )
@@ -38,22 +43,9 @@ export const getUsers = createAsyncThunk<IUser[], string, {rejectValue: string}>
 const initialState = {
     isLoading: false,
     error: null,
+    totalCount: 0,
     searchValue: '',
-    users: [
-        /*{
-            id: null,
-            avatar_url: undefined,
-            followers: 0,
-            following: 0,
-            location: null,
-            name: null,
-            login: null,
-            public_repos: null,
-            email: null,
-            created_at: null,
-            bio: null
-        }*/
-    ]
+    users: []
 } as IMainState
 
 const mainSlice = createSlice({
@@ -62,6 +54,7 @@ const mainSlice = createSlice({
     reducers: {
         clearUsers: (state) => {
             state.users = [];
+            state.totalCount = 0;
         },
         setSearchValue: (state, action) => {
             state.searchValue = action.payload;
@@ -74,7 +67,8 @@ const mainSlice = createSlice({
                 state.error = null;
             })
             .addCase(getUsers.fulfilled, (state, action) => {
-                state.users = action.payload;
+                state.users = action.payload.users;
+                state.totalCount = action.payload.totalCount;
                 state.isLoading = false;
                 state.error = null;
 
@@ -85,6 +79,6 @@ const mainSlice = createSlice({
     }
 })
 
-export const {clearUsers} = mainSlice.actions
-export default mainSlice.reducer
+export const { clearUsers, setSearchValue } = mainSlice.actions;
+export default mainSlice.reducer;
 

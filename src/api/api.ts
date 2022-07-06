@@ -5,7 +5,8 @@ import axios, { AxiosInstance } from "axios";
 const instance: AxiosInstance = axios.create({
     baseURL: process.env.REACT_APP_GITHUB_BASE_URL,
     headers: {
-        Authorization: 'token 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'
+        //Authorization: `token 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`
+        Authorization: `${process.env.REACT_APP_GITHUB_TOKEN}`
     }
 });
 
@@ -17,14 +18,16 @@ export const Api = {
                  throw new Error('Some error');
              }*/
             const foundUsers = response.data.items;
-
+            const totalCount = response.data.total_count;
+            //console.log(response)
             const usersInfoByLogin = await foundUsers.map(({ login }: any) => Api.getUserInfoByLogin(login));
 
 
             //return await Promise.all(usersInfoByLogin);
-            const result = await Promise.all(usersInfoByLogin);
-            console.log(result)
-            return result
+            const users = await Promise.all(usersInfoByLogin);
+            //console.log({ result, totalCount })
+
+            return { users, totalCount }
         } catch (error: any) {
             console.error(error.message);
         }

@@ -1,9 +1,10 @@
 import React from "react";
 import "./App.scss";
-import Users from "./components/Users/Users";
-import { Api } from "./api/api";
+import { Route, Routes } from "react-router-dom";
+import { Layout } from "./components/Layout/Layout";
+import { SearchUsers } from "./components/SearchUsers/SearchUsers";
 
-const App = () => {
+const App: React.FC = () => {
     /* const [value, setValue] = React.useState('');
      const [filtered, setFiltered] = React.useState([]);
      const debouncedSearch = useDebounce(value, 1000);
@@ -19,18 +20,23 @@ const App = () => {
 
 
     return (
-        <div className='App'>
-            <header className='App-header'>
-                <h3>github searcher</h3>
-            </header>
-            <div className='container'>
-                <Users/>
-                {/*<button onClick={()=>Api.getCode()}>autorize</button>
-                <button onClick={()=>Api.autorizeWithcCode()}>get Acsses token</button>*/}
-            </div>
+        <Routes>
+            <Route path='/' element={<Layout/>}>
+                <Route index element={<SearchUsers/>}/>
+                <Route path='user/:login' element={<div>User login</div>}/>
+            </Route>
+        </Routes>
+        /* <div className='App'>
+            {/!* <header className='App-header'>
+                 <h1>Github Searcher</h1>
+             </header>*!/}
+             <div className='container'>
+                 <SearchFieldContainer/>
+                 <UsersContainer/>
+             </div>
 
-        </div>
+         </div>*/
     );
 }
 
-export default App;
+export { App };
