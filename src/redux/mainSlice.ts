@@ -7,6 +7,7 @@ interface IMainState {
     totalCount: number;
     searchValue: string;
     users: IUser[];
+    repos: IRepository[];
 }
 
 export interface IUser {
@@ -19,13 +20,20 @@ export interface IUser {
     login: string | null;
     public_repos: number | null;
     email: string | null;
-    created_at: Date | null;
+    //created_at: Date | null;
+    created_at: string;
     bio: string | null;
 }
 
 interface IGetUsers {
     users: IUser[];
     totalCount: number;
+}
+
+interface IRepository {
+    html_url: string;
+    forks: number;
+    stargazers_count: number;
 }
 
 export const getUsers = createAsyncThunk<IGetUsers, string, { rejectValue: string }>(
@@ -38,14 +46,28 @@ export const getUsers = createAsyncThunk<IGetUsers, string, { rejectValue: strin
             return rejectWithValue(error.message);
         }
     }
-)
+);
+
+export const getRepos = createAsyncThunk<IRepository[], string, { rejectValue: string }>(
+    'main/getRepos',
+    async (login, { rejectWithValue }) => {
+        try {
+            const response = await Api.getUserReposByLogin(login);
+            console.log(response)
+            return response as IRepository[];
+        } catch (e: any) {
+            return rejectWithValue(e.message);
+        }
+    }
+);
 
 const initialState = {
     isLoading: false,
     error: null,
     totalCount: 0,
     searchValue: '',
-    users: []
+    users: [],
+    repos: []
 } as IMainState
 
 const mainSlice = createSlice({
@@ -75,6 +97,15 @@ const mainSlice = createSlice({
             })
             .addCase(getUsers.rejected, (state) => {
                 //state.status = 'rejected';
+            })
+            .addCase(getRepos.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getRepos.fulfilled, (state, action) => {
+                state.repos = action.payload;
+                state.isLoading = false;
+                state.error = null;
             })
     }
 })

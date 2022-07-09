@@ -2,12 +2,13 @@ import React from 'react';
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { useDebounce } from "../../hooks/useDebounce";
 import { getUsers } from "../../redux/mainSlice";
-import Users from "./Users";
+import { Users } from "./Users";
 
 
 const UsersContainer: React.FC = () => {
     const dispatch = useAppDispatch();
     const users = useAppSelector(state => state.main.users);
+    const totalCount = useAppSelector(state => state.main.totalCount);
     const isLoading = useAppSelector(state => state.main.isLoading);
 
     const searchValue = useAppSelector(state => state.main.searchValue);
@@ -24,16 +25,16 @@ const UsersContainer: React.FC = () => {
         return <h2>...Loading</h2>
     }
     return (
-        <div>
+        <>
 
             {
                 users.length
-                    ? <Users users={users}/>
+                    ? <Users users={users} totalCount={totalCount}/>
                     : <h2>Users not found</h2>
             }
 
-        </div>
+        </>
     );
-};
+}
 
-export default UsersContainer;
+export { UsersContainer };

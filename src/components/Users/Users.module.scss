@@ -1,4 +1,7 @@
 .users {
   //max-width: 600px;
   min-width: 50%;
+  & h4 {
+    margin: .5rem;
+  }
 }

@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./User.module.scss";
+import { useNavigate } from "react-router-dom";
 
 
 type UserProps = {
@@ -10,8 +11,13 @@ type UserProps = {
 }
 
 const User: React.FC<UserProps> = ({ name, login, avatar, repos }) => {
+    const navigate = useNavigate();
+
+    const goLogin = () => navigate(`/user/${login}`);
+
     return (
-        <div className={styles.user_container}>
+
+        <div className={styles.user_container} onClick={goLogin}>
             <img src={avatar} alt='Avatar'/>
             {
                 name
@@ -27,7 +33,7 @@ const User: React.FC<UserProps> = ({ name, login, avatar, repos }) => {
             <h4 className={styles.user_repo}>Repo: {repos}</h4>
         </div>
     );
-};
+}
 
 
-export default User;
+export { User };

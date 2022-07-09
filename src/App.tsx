@@ -2,7 +2,8 @@ import React from "react";
 import "./App.scss";
 import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout/Layout";
-import { SearchUsers } from "./components/SearchUsers/SearchUsers";
+import { SearchUsersPage } from "./Pages/SearchUsersPage";
+import { UserPage } from "./Pages/UserPage";
 
 const App: React.FC = () => {
     /* const [value, setValue] = React.useState('');
@@ -22,8 +23,8 @@ const App: React.FC = () => {
     return (
         <Routes>
             <Route path='/' element={<Layout/>}>
-                <Route index element={<SearchUsers/>}/>
-                <Route path='user/:login' element={<div>User login</div>}/>
+                <Route index element={<SearchUsersPage/>}/>
+                <Route path='user/:login' element={<UserPage/>}/>
             </Route>
         </Routes>
         /* <div className='App'>
