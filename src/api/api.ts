@@ -4,7 +4,7 @@ import axios, { AxiosInstance } from "axios";
 const instance: AxiosInstance = axios.create({
     baseURL: process.env.REACT_APP_GITHUB_BASE_URL,
     headers: {
-        //Authorization: `token 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`
+        //Authorization: `token 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`
         Authorization: `${process.env.REACT_APP_GITHUB_TOKEN}`
     }
 });
@@ -68,11 +68,13 @@ export const Api = {
         try {
             const response = await instance.get(`users/${login}/repos`);
             const repos = response.data.map((r: any) => ({
+                id: r.id,
+                name: r.name,
                 html_url: r.html_url,
                 forks: r.forks,
                 stargazers_count: r.stargazers_count
             }));
-            console.log(repos)
+            //console.log(repos)
             return repos;
         } catch (e) {
             if (e instanceof Error) {

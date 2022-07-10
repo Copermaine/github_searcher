@@ -1,11 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Api } from "../api/api";
 
+
 interface IMainState {
     isLoading: boolean;
     error: string | null;
     totalCount: number;
-    searchValue: string;
+    usersSearchValue: string;
+    reposSearchValue: string;
+    filteredRepos: IRepository[];
     users: IUser[];
     repos: IRepository[];
 }
@@ -17,10 +20,9 @@ export interface IUser {
     following: number;
     location: string | null;
     name: string | null;
-    login: string | null;
+    login: string;
     public_repos: number | null;
     email: string | null;
-    //created_at: Date | null;
     created_at: string;
     bio: string | null;
 }
@@ -30,7 +32,9 @@ interface IGetUsers {
     totalCount: number;
 }
 
-interface IRepository {
+export interface IRepository {
+    id: number;
+    name: string;
     html_url: string;
     forks: number;
     stargazers_count: number;
@@ -53,7 +57,6 @@ export const getRepos = createAsyncThunk<IRepository[], string, { rejectValue: s
     async (login, { rejectWithValue }) => {
         try {
             const response = await Api.getUserReposByLogin(login);
-            console.log(response)
             return response as IRepository[];
         } catch (e: any) {
             return rejectWithValue(e.message);
@@ -65,7 +68,9 @@ const initialState = {
     isLoading: false,
     error: null,
     totalCount: 0,
-    searchValue: '',
+    usersSearchValue: '',
+    reposSearchValue: '',
+    filteredRepos: [],
     users: [],
     repos: []
 } as IMainState
@@ -78,9 +83,22 @@ const mainSlice = createSlice({
             state.users = [];
             state.totalCount = 0;
         },
-        setSearchValue: (state, action) => {
-            state.searchValue = action.payload;
-        }
+        clearRepos: (state) => {
+            state.repos = [];
+        },
+        clearFilteredRepos: (state) => {
+            state.filteredRepos = [];
+        },
+        setUsersSearchValue: (state, action) => {
+            state.usersSearchValue = action.payload;
+        },
+        setReposSearchValue: (state, action) => {
+            state.reposSearchValue = action.payload;
+        },
+        setFilteredRepos: (state, action) => {
+            state.filteredRepos = action.payload;
+        },
+
     },
     extraReducers: (builder) => {
         builder
@@ -110,6 +128,10 @@ const mainSlice = createSlice({
     }
 })
 
-export const { clearUsers, setSearchValue } = mainSlice.actions;
+export const {
+    setUsersSearchValue,
+    setReposSearchValue, setFilteredRepos,
+    clearUsers, clearRepos, clearFilteredRepos
+} = mainSlice.actions;
 export default mainSlice.reducer;
 

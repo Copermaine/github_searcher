@@ -1,19 +1,24 @@
 import React from "react";
 import styles from "./User.module.scss";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../hooks";
+import { getRepos } from "../../redux/mainSlice";
 
 
 type UserProps = {
     name: string | null
-    login: string | null
+    login: string
     avatar: string
     repos: number | null
 }
 
 const User: React.FC<UserProps> = ({ name, login, avatar, repos }) => {
     const navigate = useNavigate();
-
-    const goLogin = () => navigate(`/user/${login}`);
+    //const dispatch = useAppDispatch();
+    const goLogin = () => {
+        navigate(`/user/${login}`);
+        //dispatch(getRepos(login))
+    };
 
     return (
 

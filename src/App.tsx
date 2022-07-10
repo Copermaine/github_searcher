@@ -32,7 +32,7 @@ const App: React.FC = () => {
                  <h1>Github Searcher</h1>
              </header>*!/}
              <div className='container'>
-                 <SearchFieldContainer/>
+                 <UsersSearchFieldContainer/>
                  <UsersContainer/>
              </div>
 

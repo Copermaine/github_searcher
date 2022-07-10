@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { useDebounce } from "../../hooks/useDebounce";
 import { getUsers } from "../../redux/mainSlice";
@@ -11,9 +11,9 @@ const UsersContainer: React.FC = () => {
     const totalCount = useAppSelector(state => state.main.totalCount);
     const isLoading = useAppSelector(state => state.main.isLoading);
 
-    const searchValue = useAppSelector(state => state.main.searchValue);
+    const usersSearchValue = useAppSelector(state => state.main.usersSearchValue);
 
-    const debouncedSearch = useDebounce(searchValue, 1000);
+    const debouncedSearch = useDebounce(usersSearchValue, 1000);
 
     React.useEffect(() => {
         if (debouncedSearch) {
@@ -21,7 +21,7 @@ const UsersContainer: React.FC = () => {
         }
     }, [debouncedSearch]);
 
-    if(isLoading) {
+    if (isLoading) {
         return <h2>...Loading</h2>
     }
     return (
@@ -35,6 +35,6 @@ const UsersContainer: React.FC = () => {
 
         </>
     );
-}
+};
 
 export { UsersContainer };
