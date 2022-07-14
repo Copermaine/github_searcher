@@ -1,6 +1,6 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks";
-import { clearUsers, setUsersSearchValue } from "../../redux/mainSlice";
+import { clearUsers, setUserCurrentPage, setUsersSearchValue } from "../../redux/mainSlice";
 import { SearchField } from "./SearchField";
 
 
@@ -15,6 +15,7 @@ const UsersSearchFieldContainer: React.FC = () => {
             dispatch(clearUsers());
         }
         dispatch(setUsersSearchValue(inputValue));
+        dispatch(setUserCurrentPage());
     };
 
     return <SearchField value={usersSearchValue} changeValue={handlerSearchValue} placeholder={'Search users'}/>

@@ -1,8 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useAppSelector } from "../../hooks";
-
-import styles from "./UserInfo.module.scss"
+import styles from "./UserInfo.module.scss";
 
 
 const UserInfo: React.FC = () => {
@@ -27,7 +26,11 @@ const UserInfo: React.FC = () => {
                 </div>
             </div>
             <div className={styles.user_bio}>
-                <h6>Bio: {user?.bio ?? 'none'}</h6>
+                {
+                    user?.bio
+                        ? <h6>Bio: {user.bio}</h6>
+                        : <h6>This user don't have biography</h6>
+                }
             </div>
         </div>
     );
