@@ -6,9 +6,13 @@ import { IRepository, IUser } from "../types";
 interface IMainState {
     isLoading: boolean;
     isLoadMore: boolean;
+    isLoadMoreRepos: boolean;
+    reposCurrentPage: number;
+    reposCount: number;
+    totalReposCount: number;
     error: string | null;
     userCurrentPage: number;
-    totalCount: number;
+    totalUserCount: number;
     usersSearchValue: string;
     reposSearchValue: string;
     filteredRepos: IRepository[];
@@ -22,18 +26,22 @@ type GetUsersThunkType = {
     totalCount: number;
 }
 
-type SearchDataThunkType = {
+type RequestsDataRepos = {
+    login?: string;
+    page?: number;
+}
+
+type RequestsDataUsers = {
     searchValue: string;
     page?: number;
 }
 
-export const getUsers = createAsyncThunk<GetUsersThunkType, SearchDataThunkType, { rejectValue: string }>(
+export const getUsers = createAsyncThunk<GetUsersThunkType, RequestsDataUsers, { rejectValue: string }>(
     'main/getUsers',
     async (searchData, { rejectWithValue }) => {
         const { searchValue, page } = searchData;
         const response = await Api.searchUsers(searchValue, page);
         if (response.status !== 200) {
-            console.log(response)
             return rejectWithValue('Server error');
         }
         const foundUsers = response.data.items;
@@ -55,7 +63,7 @@ export const getUsers = createAsyncThunk<GetUsersThunkType, SearchDataThunkType,
     }
 );
 
-export const loadMoreUsers = createAsyncThunk<GetUsersThunkType, SearchDataThunkType, { rejectValue: string }>(
+export const loadMoreUsers = createAsyncThunk<GetUsersThunkType, RequestsDataUsers, { rejectValue: string }>(
     'main/loadMoreUsers',
     async (searchData, { rejectWithValue }) => {
         const { searchValue, page } = searchData;
@@ -101,11 +109,34 @@ export const getRepos = createAsyncThunk<IRepository[], string, { rejectValue: s
     }
 );
 
+export const loadMoreRepos = createAsyncThunk<IRepository[], RequestsDataRepos, { rejectValue: string }>(
+    'main/loadMoreRepos',
+    async (reposData, { rejectWithValue }) => {
+        const { login, page } = reposData
+        const response = await Api.getUserReposByLogin(login, page);
+        if (response.status !== 200) {
+            return rejectWithValue('Server error');
+        }
+        const repos = response.data.map((r: any) => ({
+            id: r.id,
+            name: r.name,
+            html_url: r.html_url,
+            forks: r.forks,
+            stargazers_count: r.stargazers_count
+        }));
+        return repos as IRepository[];
+    }
+);
+
 const initialState = {
     isLoading: false,
     isLoadMore: false,
+    isLoadMoreRepos: false,
+    reposCurrentPage: 1,
+    reposCount: 0,
+    totalReposCount: 0,
     error: null,
-    totalCount: 0,
+    totalUserCount: 0,
     userCurrentPage: 1,
     usersSearchValue: '',
     reposSearchValue: '',
@@ -121,10 +152,13 @@ const mainSlice = createSlice({
     reducers: {
         clearUsers: (state) => {
             state.users = [];
-            state.totalCount = 0;
+            state.totalUserCount = 0;
         },
         clearRepos: (state) => {
             state.repos = [];
+            state.reposCount = 0;
+            state.totalReposCount = 0;
+            state.reposCurrentPage = 1;
         },
         clearFilteredRepos: (state) => {
             state.filteredRepos = [];
@@ -135,16 +169,21 @@ const mainSlice = createSlice({
         setReposSearchValue: (state, action) => {
             state.reposSearchValue = action.payload;
         },
+        setIsLoadRepoMore: (state,action) => {
+            state.isLoadMoreRepos = action.payload;
+        },
+        setTotalRepos: (state,action) => {
+            state.totalReposCount = action.payload;
+        },
         setFilteredRepos: (state, action) => {
             state.filteredRepos = action.payload;
         },
         setIsLoadMore: (state, action) => {
             state.isLoadMore = action.payload;
         },
-
         setUserCurrentPage: (state) => {
             state.userCurrentPage = 1;
-        },
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -155,15 +194,14 @@ const mainSlice = createSlice({
             })
             .addCase(getUsers.fulfilled, (state, action) => {
                 state.users = action.payload.users;
-                state.totalCount = action.payload.totalCount;
+                state.totalUserCount = action.payload.totalCount;
                 state.usersCount = state.users.length;
                 state.isLoading = false;
                 state.error = null;
                 state.userCurrentPage += 1;
             })
             .addCase(loadMoreUsers.fulfilled, (state, action) => {
-                //state.users = [...state.users, ...action.payload.users];
-                state.users.push(...action.payload.users);
+                state.users = [...state.users, ...action.payload.users];
                 state.isLoadMore = false;
                 state.usersCount = state.users.length;
                 state.error = null;
@@ -175,19 +213,31 @@ const mainSlice = createSlice({
             })
             .addCase(getRepos.fulfilled, (state, action) => {
                 state.repos = action.payload;
+                state.reposCount = state.repos.length;
                 state.isLoading = false;
+                state.reposCurrentPage +=1;
+                state.error = null;
+            })
+            .addCase(loadMoreRepos.pending, (state) => {
+                state.reposCurrentPage +=1;
+            })
+            .addCase(loadMoreRepos.fulfilled, (state, action) => {
+                state.repos = [...state.repos, ...action.payload];
+                state.reposCount = state.repos.length;
+                state.isLoadMoreRepos = false;
                 state.error = null;
             })
             .addMatcher(isError, (state, action: PayloadAction<string>) => {
-                state.error = action.payload;
+                state.error = action.payload ? action.payload : 'Some error server';
                 state.isLoading = false;
             })
     }
-})
+});
+
 const isError = (action: AnyAction) => action.type.endsWith('rejected');
 
 export const {
-    setUsersSearchValue, setIsLoadMore, setReposSearchValue, setFilteredRepos,
+    setUsersSearchValue, setIsLoadMore, setReposSearchValue, setFilteredRepos, setIsLoadRepoMore, setTotalRepos,
     clearUsers, clearRepos, clearFilteredRepos, setUserCurrentPage
 } = mainSlice.actions;
 export default mainSlice.reducer;

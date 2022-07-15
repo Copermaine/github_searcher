@@ -1,5 +1,4 @@
 import React from "react";
-
 import styles from "./Repo.module.scss"
 
 type RepoType = {

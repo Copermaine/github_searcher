@@ -2,28 +2,27 @@ import React from "react";
 import { User } from "../User/User";
 import styles from "./Users.module.scss";
 import { setIsLoadMore } from "../../redux/mainSlice";
-import { useInView } from 'react-intersection-observer';
+import { useInView } from "react-intersection-observer";
 import { useAppDispatch } from "../../hooks";
 import { IUser } from "../../types";
 
 
 type UsersPropsType = {
     users: IUser[];
-    totalCount: number;
+    totalUserCount: number;
     usersCount: number;
     isLoadMore: boolean;
 }
 
-const Users: React.FC<UsersPropsType> = (props) => {
-    const { users, totalCount, usersCount, isLoadMore } = props;
+const Users: React.FC<UsersPropsType> = ({ users, totalUserCount, usersCount, isLoadMore }) => {
 
     const dispatch = useAppDispatch();
 
-    //todo Intersection Observer hook
+    // Intersection Observer hook
     const { ref: myRef, inView } = useInView();
-    console.log(inView)
+
     React.useEffect(() => {
-        if (usersCount < totalCount) {
+        if (usersCount < totalUserCount) {
            dispatch(setIsLoadMore(inView));
         }
     }, [inView]);
@@ -31,9 +30,9 @@ const Users: React.FC<UsersPropsType> = (props) => {
     return (
         <div className={styles.users}>
             {
-                totalCount > 1
-                    ? <h4>Users found: {totalCount}</h4>
-                    : <h4>User found: {totalCount}</h4>
+                totalUserCount > 1
+                    ? <h4>Users found: {totalUserCount}</h4>
+                    : <h4>User found: {totalUserCount}</h4>
             }
             {
                 users.map(user => (

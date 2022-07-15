@@ -2,11 +2,11 @@ import axios, { AxiosInstance } from "axios";
 
 
 const instance: AxiosInstance = axios.create({
-    baseURL: 'https://api.github.com/',
-    //baseURL: process.env.REACT_APP_GITHUB_BASE_URL,
+    //baseURL: 'https://api.github.com/',
+    baseURL: process.env.REACT_APP_GITHUB_BASE_URL,
     headers: {
-        //Authorization: `${process.env.REACT_APP_GITHUB_TOKEN}`
-        Authorization: 'token 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'
+        Authorization: `${process.env.REACT_APP_GITHUB_TOKEN}`
+        //Authorization: 'token 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'
     }
 });
 
@@ -77,8 +77,7 @@ export const Api = {
     getUserInfoByLogin: async (userLogin: string) => {
         return await instance.get(`users/${userLogin}`);
     },
-
-    getUserReposByLogin: async (login: string) => {
-        return await instance.get(`users/${login}/repos`);
+    getUserReposByLogin: async (login: string = '', page: number = 1) => {
+        return await instance.get(`users/${login}/repos?per_page=10&page=${page}`);
     }
 };

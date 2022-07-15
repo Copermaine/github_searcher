@@ -1,7 +1,7 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { useDebounce } from "../../hooks/useDebounce";
-import { getUsers, loadMoreUsers, setIsLoadMore, setReposSearchValue, setUserCurrentPage } from "../../redux/mainSlice";
+import { getUsers, loadMoreUsers } from "../../redux/mainSlice";
 import { Users } from "./Users";
 
 
@@ -10,7 +10,7 @@ const UsersContainer: React.FC = () => {
 
     const users = useAppSelector(state => state.main.users);
     const usersCount = useAppSelector(state => state.main.usersCount);
-    const totalCount = useAppSelector(state => state.main.totalCount);
+    const totalUserCount = useAppSelector(state => state.main.totalUserCount);
     const userCurrentPage = useAppSelector(state => state.main.userCurrentPage);
 
     const isLoading = useAppSelector(state => state.main.isLoading);
@@ -26,32 +26,23 @@ const UsersContainer: React.FC = () => {
         }
     }, [debouncedSearch]);
 
-
-    //todo reset value before render
-    React.useEffect(() => {
-        dispatch(setIsLoadMore(false));
-        dispatch(setReposSearchValue(''));
-
-    }, []);
-
-
     React.useEffect(() => {
         if (debouncedSearch && isLoadMore) {
-            dispatch(loadMoreUsers({ searchValue: debouncedSearch, page: userCurrentPage }))
+            dispatch(loadMoreUsers({ searchValue: debouncedSearch, page: userCurrentPage }));
         }
     }, [isLoadMore]);
-
 
     if (isLoading) {
         return <h2>...Loading</h2>
     }
+
     return (
         <>
             {
                 err
                     ? <h2>{err}</h2>
                     : users.length
-                    ? <Users users={users} totalCount={totalCount}
+                    ? <Users users={users} totalUserCount={totalUserCount}
                              usersCount={usersCount}
                              isLoadMore={isLoadMore}/>
                     : <h2>Users not found</h2>

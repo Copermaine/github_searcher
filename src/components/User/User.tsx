@@ -1,6 +1,8 @@
 import React from "react";
 import styles from "./User.module.scss";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../hooks";
+import { setTotalRepos } from "../../redux/mainSlice";
 
 
 type UserPropsType = {
@@ -12,8 +14,12 @@ type UserPropsType = {
 
 const User: React.FC<UserPropsType> = ({ name, login, avatar, repos }) => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
-    const goToMoreInfo = () => navigate(`/user/${login}`);
+    const goToMoreInfo = () => {
+        navigate(`/user/${login}`)
+        dispatch(setTotalRepos(repos))
+    };
 
     return (
         <div className={styles.user_container} onClick={goToMoreInfo}>

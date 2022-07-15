@@ -1,58 +1,50 @@
 import React from "react";
-import { useAppDispatch, useAppSelector } from "../../hooks";
-import { useParams } from "react-router-dom";
+import { useAppDispatch } from "../../hooks";
 import { Repo } from "../Repo/Repo";
-import { clearFilteredRepos, clearRepos, getRepos, setFilteredRepos } from "../../redux/mainSlice";
+import { setIsLoadRepoMore } from "../../redux/mainSlice";
+import { useInView } from "react-intersection-observer";
+import { IRepository } from "../../types";
 
-const Repos: React.FC = () => {
+
+type ReposPropsType = {
+    filteredRepos: IRepository[];
+    totalReposCount: number;
+    reposCount: number;
+    isLoadMoreRepos: boolean;
+    isLoading: boolean;
+}
+
+const Repos: React.FC<ReposPropsType> = (props) => {
+    const { reposCount, totalReposCount, filteredRepos, isLoadMoreRepos, isLoading} = props;
+
     const dispatch = useAppDispatch();
-    const { login } = useParams();
 
-    const repos = useAppSelector(state => state.main.repos);
-    const isLoading = useAppSelector(state => state.main.isLoading);
-    const reposSearchValue = useAppSelector(state => state.main.reposSearchValue);
-    const filteredRepos = useAppSelector(state => state.main.filteredRepos);
+    //Intersection Observer hook
+    const { ref: myRef, inView } = useInView();
 
-    const filterRepos = (value: string) => {
-        let reposArray = [...repos];
-        reposArray = reposArray.filter(repo => repo.name.toLowerCase().includes(value.toLowerCase()));
-        dispatch(setFilteredRepos(reposArray));
-    }
-
-    //todo get repositories
     React.useEffect(() => {
-        dispatch(getRepos(login as string));
-        return () => {
-            dispatch(clearRepos());
+        if (reposCount < totalReposCount) {
+            dispatch(setIsLoadRepoMore(inView));
         }
-    }, []);
-
-    //todo set search value repository
-    React.useEffect(() => {
-        filterRepos(reposSearchValue);
-    }, [reposSearchValue]);
-
-    //todo set and remove filtered repository
-    React.useEffect(() => {
-        dispatch(setFilteredRepos(repos));
-        return ()=> {
-            dispatch(clearFilteredRepos());
-        }
-    }, [repos]);
-
+    }, [inView]);
 
     if (isLoading) {
         return <div>...Loading repos</div>
     }
     return (
-        <>
+        <div>
             {
                 filteredRepos.map(repo => (
                     <Repo key={repo.id} name={repo.name} forks={repo.forks}
                           stargazers_count={repo.stargazers_count} html_url={repo.html_url}/>
                 ))
             }
-        </>
+            <div ref={myRef}/>
+            {
+                isLoadMoreRepos && <h2>Load more repos...</h2>
+            }
+            <h2>{inView}</h2>
+        </div>
     );
 };
 
