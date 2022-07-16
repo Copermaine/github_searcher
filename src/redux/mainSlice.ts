@@ -27,7 +27,7 @@ type GetUsersThunkType = {
 }
 
 type RequestsDataRepos = {
-    login?: string;
+    login: string;
     page?: number;
 }
 
@@ -159,6 +159,7 @@ const mainSlice = createSlice({
             state.reposCount = 0;
             state.totalReposCount = 0;
             state.reposCurrentPage = 1;
+            state.reposSearchValue = '';
         },
         clearFilteredRepos: (state) => {
             state.filteredRepos = [];

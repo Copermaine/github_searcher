@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./Repo.module.scss"
+import styles from "./Repo.module.scss";
 
 type RepoType = {
     name: string;

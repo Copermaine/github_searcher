@@ -14,7 +14,7 @@ const Layout: React.FC = () => {
 
         </div>
     );
-}
+};
 
 export { Layout };
 

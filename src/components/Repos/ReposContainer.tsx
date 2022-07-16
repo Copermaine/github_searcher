@@ -21,7 +21,9 @@ const ReposContainer: React.FC = () => {
     const totalReposCount = useAppSelector(state => state.main.totalReposCount);
     const reposCount = useAppSelector(state => state.main.reposCount);
 
-    //function for filtered repos array
+    const err = useAppSelector(state => state.main.error);
+
+    //function for filtering repos array
     const filterRepos = (value: string) => {
         let reposData = [...repos];
         reposData = reposData.filter(repo => repo.name.toLowerCase().includes(value.toLowerCase()));
@@ -44,7 +46,7 @@ const ReposContainer: React.FC = () => {
 
     React.useEffect(() => {
         if (reposCount < totalReposCount && reposCurrentPage > 1) {
-            dispatch(loadMoreRepos({ login: login, page: reposCurrentPage }));
+            dispatch(loadMoreRepos({ login: login as string, page: reposCurrentPage }));
         }
     }, [isLoadMoreRepos]);
 
@@ -53,12 +55,18 @@ const ReposContainer: React.FC = () => {
     }, [reposSearchValue]);
 
     if (isLoading) {
-        return <div>...Loading repos</div>
+        return <h2>...Loading repos</h2>
     }
+
     return (
         <>
-            <Repos filteredRepos={filteredRepos} reposCount={reposCount} isLoading={isLoading}
-                   totalReposCount={totalReposCount} isLoadMoreRepos={isLoadMoreRepos}/>
+            {
+                err
+                    ? <h2>{err}</h2>
+                    : <Repos filteredRepos={filteredRepos} reposCount={reposCount} isLoading={isLoading}
+                             totalReposCount={totalReposCount} isLoadMoreRepos={isLoadMoreRepos}/>
+
+            }
         </>
     );
 };

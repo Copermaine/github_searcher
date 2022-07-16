@@ -12,9 +12,10 @@ const App: React.FC = () => {
             <Route path='/' element={<Layout/>}>
                 <Route index element={<SearchUsersPage/>}/>
                 <Route path='user/:login' element={<UserPage/>}/>
+                <Route path='*' element={ <h1>Page not found</h1> }/>
             </Route>
         </Routes>
     );
-}
+};
 
 export { App };

@@ -28,9 +28,6 @@ const Repos: React.FC<ReposPropsType> = (props) => {
         }
     }, [inView]);
 
-    if (isLoading) {
-        return <div>...Loading repos</div>
-    }
     return (
         <div>
             {
